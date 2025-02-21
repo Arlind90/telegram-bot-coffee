@@ -5,13 +5,21 @@ import yfinance as yf
 from telegram import Bot, Update
 from telegram.ext import Application, CommandHandler
 from apscheduler.schedulers.background import BackgroundScheduler
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Enable logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Telegram API details
-TELEGRAM_API_KEY = "7888234636:AAGoUhjN-9F5CFKU81vAcBMDg1YseBb_EkQ"
+TELEGRAM_API_KEY = os.getenv('TELEGRAM_API_KEY')
+if not TELEGRAM_API_KEY:
+    raise ValueError("TELEGRAM_API_KEY environment variable is not set!")
+
 # Initialize empty set for subscribers and define file path
 SUBSCRIBERS_FILE = "subscribers.json"
 
