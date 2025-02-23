@@ -46,13 +46,16 @@ async def get_coffee_price():
     """Fetches the latest coffee price from Yahoo Finance."""
     ticker = "KC=F"  # Coffee Futures symbol
     coffee = yf.Ticker(ticker)
-    data = coffee.history(period="1d")  # Get latest daily price
+    # Get data for the last 5 days to ensure we have the last trading day
+    data = coffee.history(period="5d")
 
     if not data.empty:
-        price = data["Close"].iloc[-1]  # Get latest closing price
-        return f"☕ Current Coffee Price: ${price:.2f} per pound"
+        price_per_pound = data["Close"].iloc[-1] / 100  # Convert cents to dollars
+        price_per_kg = price_per_pound * 2.20462  # Convert price from per pound to per kg
+        last_date = data.index[-1].strftime("%Y-%m-%d")
+        return f"☕ Coffee Price (as of {last_date}): ${price_per_kg:.3f} per kg"
     else:
-        return "Could not fetch coffee price."
+        return "Could not fetch coffee price. Please try again later."
 
 async def send_daily_price():
     """Fetches coffee price and sends it to all subscribers daily."""
@@ -105,9 +108,14 @@ def main():
 
     # Start APScheduler
     scheduler = BackgroundScheduler()
-    scheduler.add_job(job, "cron", hour=16, minute=45)  # Sends price update at 9:00 AM daily
+    # Schedule for 20:00 Rome time (2:00 PM ET + 6 hours)
+    scheduler.add_job(job, "cron", 
+                     day_of_week='0-4',  # Monday through Friday
+                     hour=20,            # 8:00 PM Rome time (after US market close)
+                     minute=0,
+                     timezone='Europe/Rome')
     scheduler.start()
-    logger.info("Scheduler started for daily updates.")
+    logger.info("Scheduler started for daily updates (weekdays at 20:00 Rome time)")
 
     # Run the bot
     app.run_polling()
