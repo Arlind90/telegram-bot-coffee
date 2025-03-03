@@ -34,6 +34,11 @@ For the daily 9:00 AM update, set up a scheduled function in Netlify:
 4. Deploy the site
 5. Once deployed, visit `https://your-app-name.netlify.app/.netlify/functions/setup-webhook` to register your webhook with Telegram
 
+### Project Structure
+
+- `netlify/functions/`: Contains all serverless functions
+- `public/`: Contains static files served by Netlify (only a landing page in this case)
+
 ## Local Development
 
 1. Install dependencies:
@@ -46,6 +51,11 @@ For the daily 9:00 AM update, set up a scheduled function in Netlify:
    ```
    npm run dev
    ```
+
+## Troubleshooting
+
+- **Deployment Error: "Deploy directory 'public' does not exist"**: Make sure the `public` directory exists with at least an index.html file.
+- **Webhook not working**: Check that your environment variables are set correctly and that the `WEBHOOK_URL` points to your deployed Netlify site.
 
 ## Architecture
 
